@@ -1,19 +1,44 @@
 package allConnexion;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Offres {
 
 	private String Domaine, Libelle, Descriptif;
 	private Date date;
-	private int duree,id;
+	private int duree,idEntreprise, idOffre;
+	private ArrayList<Utilisateur> listUtilisateur;
 	
 	public Offres(String Domaine, String Libelle, Date date, int duree, String Descriptif){
+		this.listUtilisateur = new ArrayList<Utilisateur>();
+		this.idEntreprise=0;
+		this.idOffre=0;
 		this.Domaine = Domaine;
 		this.Libelle = Libelle;
 		this.date = date;
 		this.duree = duree;
 		this.Descriptif = Descriptif;
+	}
+
+
+	public int getIdEntreprise() {
+		return idEntreprise;
+	}
+
+
+	public int getIdOffre() {
+		return idOffre;
+	}
+
+
+	public void setIdEntreprise(int idEntreprise) {
+		this.idEntreprise = idEntreprise;
+	}
+
+
+	public void setIdOffre(int idOffre) {
+		this.idOffre = idOffre;
 	}
 
 

@@ -1,12 +1,15 @@
 package allConnexion;
 
+import java.awt.List;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class TestBDD {
 
-	public static void main(String[] args) throws DAOException, ParseException {
+	public static void main(String[] args) throws DAOException, ParseException, SQLException {
 			 //nom, numRue, ville, cPostal, mail, tel, secteur
 		     Entreprise entreprise = new Entreprise("Michel", "23 residence isbc",91900,"Evry","test@evry.fr","019231239","Informatique");
 		     Entreprise entreprise2 = new Entreprise("Dupont", "ahah 23",91900,"Evry","test@evry.fr","012331239","Informatique");
@@ -24,7 +27,7 @@ public class TestBDD {
 		     System.out.println(formater.format(d1));
 		     
 		     //offre
-		     Offres o = new Offres("Stage","Libelle",d1,3,"Pour 6 mois minimum");
+		     Offres o = new Offres("Stage de ralouf","Libelle",d1,3,"Pour 6 mois minimum");
 		     OffresDaoImpl offer = new OffresDaoImpl();
 		     
 		     // Try entreprise && offre;
@@ -33,9 +36,11 @@ public class TestBDD {
 				//Business.creer(entreprise2);
 				//System.out.println(Business.trouver(entreprise.getNom()).getId());
 				//System.out.println(Business.trouver(entreprise2.getNom()).getId());
-				//Business.creer(entreprise);
+				System.out.println(Business.trouver(entreprise.getNom()).getNom());;
 		    	//Business.supprimer(entreprise);
-		    	 offer.creer(entreprise2, o);
+		    	 //offer.creer(entreprise2, o);
+		    	 ArrayList<Offres> list = (ArrayList<Offres>) offer.listOffre(entreprise2);
+		    	 System.out.println(list.size());
 			} catch (DAOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
