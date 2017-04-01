@@ -2,15 +2,24 @@ package allConnexion;
 
 
 public class Utilisateur {
-	private String nom, mdp;
+	private String nom, mdp, mail;
 	int role;
 	
-	public Utilisateur(String nom, String mdp, int role){ // 1 = étudiant, 2 = entrepeneur, 3 = administrateur
+	public Utilisateur(String nom, String mdp,String mail, int role){ // 1 = étudiant, 2 = entrepeneur, 3 = administrateur
 		this.nom = nom;
 		this.mdp = mdp;
+		this.mail = mail;
 		this.role = role;
 	}
 	
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+
 	public String getNom() {
 		return nom;
 	}

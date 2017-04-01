@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.NoSuchAlgorithmException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -225,7 +226,12 @@ public class Accueil extends JFrame {
 				// TODO Auto-generated method stub
 				UtilisateurDaolmpl n = new UtilisateurDaolmpl();
 				Utilisateur e = new Utilisateur(tNom.getText(), tMdp.getText(), c.getSelectedIndex()+1);
-				n.creer(e);
+				try {
+					n.creer(e);
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				setVisible(false);
 				new ChoixFrame(getQui());
 			}
