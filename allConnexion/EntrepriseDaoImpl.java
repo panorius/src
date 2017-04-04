@@ -17,7 +17,7 @@ public class EntrepriseDaoImpl implements EntrepriseDao{
 			state.setString(1, entreprise.getNom());
 			state.setString(2, entreprise.getNumRue());
 			state.setString(3, entreprise.getVille());
-			state.setInt(4, entreprise.getId());
+			state.setInt(4, entreprise.getcPostal());
 			state.setString(5, entreprise.getMail());
 			state.setString(6, entreprise.getTel());
 			state.setString(7, entreprise.getSecteur());
