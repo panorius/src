@@ -32,6 +32,28 @@ public class ListOffresDaoImpl implements ListOffresDao{
 		}
 		return listOffres;
 	}
+	public List<Integer> recupListOffresByID(int i)throws DAOException, SQLException {
+		List<Integer> listIdOffres = new ArrayList<Integer>();
+		try {
+			final String SQL_SELECT = "SELECT idOffre FROM listoffres WHERE idUtilisateur = ?";
+			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
+			state.setInt(1, i);
+			ResultSet rs = state.executeQuery();
+			while(rs.next()){
+				//Offres offre = new Offres(rs.getString(1),rs.getString(2),rs.getString(3),rs.getDate(4),rs.getInt(5),rs.getString(6));
+				listIdOffres.add(rs.getInt(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(state!=null){
+				state.close();
+			}
+		}
+		return listIdOffres;
+	}
 	@Override
 	public void creer(int usr, int offr, int entr) throws SQLException, DAOException {
 		System.out.println(usr+" "+offr);
@@ -51,5 +73,10 @@ public class ListOffresDaoImpl implements ListOffresDao{
 				state.close();
 			}
 		}
+	}
+	@Override
+	public void supprimer(Entreprise entreprise) throws DAOException, SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 }

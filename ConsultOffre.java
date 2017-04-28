@@ -38,7 +38,7 @@ public class ConsultOffre extends Frame{
 	private DefaultTableModel dtm = null;
 	private String tableTitle[] = {"Nom_Entreprise", "Domaine", "Libelle", "Date", "Duree", "Descriptif"};
 	private List<Offres> listOffres = new ArrayList<Offres>();
-	private int taille = 0, id, duree=0;
+	private int taille = 0, idO, idE, duree=0;
 	private TableModel modele;
 	private JTable table;
 	private Offres o, o2;
@@ -49,10 +49,8 @@ public class ConsultOffre extends Frame{
 	public ConsultOffre(Utilisateur user){
 		super();
 		setUser(user);
-
 		OffresDaoImpl Offres = new OffresDaoImpl();
 		try {
-			//taille = Offres.listOffreAll().size();
 			setListOffres(Offres.listOffreAll());
 		} catch (DAOException e) {
 			// TODO Auto-generated catch block
@@ -61,7 +59,6 @@ public class ConsultOffre extends Frame{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		modele = new TableModel(getListOffres());
 		table = new JTable(modele);		
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,11 +97,10 @@ public class ConsultOffre extends Frame{
 						(String) table.getValueAt(selection, 5));
 				OffresDaoImpl odi = new OffresDaoImpl();
 				UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
-				EntrepriseDaoImpl edi = new EntrepriseDaoImpl();
 				try {
 					setUser(udi.recupUtilisateur(user));
-					setEntr(edi.userEntreprise(getUser()));
-					setId(odi.idOffres(o));
+					setIdO(odi.idOffres(o));
+					setIdE(odi.recupOffreIdEntr(getIdO()));
 				} catch (DAOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -112,7 +108,7 @@ public class ConsultOffre extends Frame{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				new ConsultFrame(getUser(),getUser().getId(), getId(), getEntr().getId());
+				new ConsultFrame(getUser(), getIdO(), getIdE());
 			}
 		});
 		super.retour.addActionListener(new ActionListener(){
@@ -165,14 +161,6 @@ public class ConsultOffre extends Frame{
 		this.taille = taille;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public Offres getO() {
 		return o;
 	}
@@ -223,5 +211,21 @@ public class ConsultOffre extends Frame{
 
 	public void setEntr(Entreprise entr) {
 		this.entr = entr;
+	}
+
+	public int getIdO() {
+		return idO;
+	}
+
+	public void setIdO(int idO) {
+		this.idO = idO;
+	}
+
+	public int getIdE() {
+		return idE;
+	}
+
+	public void setIdE(int idE) {
+		this.idE = idE;
 	}
 }

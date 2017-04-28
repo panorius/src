@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
- 
+ //Cette classe a été implémenté juste pour le coté esthetique des profils mais n'a pas encore placé
 public class Dessin extends JPanel {
      
     public Dessin() {

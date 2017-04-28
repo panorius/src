@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -14,7 +15,12 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -25,6 +31,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -38,6 +45,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import allConnexion.DAOException;
 import allConnexion.Entreprise;
+import allConnexion.EntrepriseDaoImpl;
+import allConnexion.ListOffresDaoImpl;
 import allConnexion.Offres;
 import allConnexion.OffresDaoImpl;
 import allConnexion.Utilisateur;
@@ -48,7 +57,8 @@ public class Profil {
 			good = new JButton(new ImageIcon("src/img/29380bis.png")),
 			good2 = new JButton(new ImageIcon("src/img/29380bis.png")),
 			mod = new JButton(new ImageIcon("src/img/6244.png")),
-			mod2 = new JButton(new ImageIcon("src/img/6244.png"));
+			mod2 = new JButton(new ImageIcon("src/img/6244.png")),
+			visu = new JButton("Visualiser");
 	JTextField fNom = new JTextField(),
 			fMail = new JTextField(),
 			chemin = new JTextField(13);
@@ -58,16 +68,26 @@ public class Profil {
 			vMail,
 			cNom = new JLabel("Nom: "),
 			cMail = new JLabel("Mail: ");
-	JPanel p2 = new JPanel(new FlowLayout());
+	JPanel p2 = new JPanel(new BorderLayout());
+	JPanel p3 = new JPanel(new BorderLayout());
+	JPanel p4 = new JPanel(new FlowLayout());
 	JPanel panGridLog = new JPanel(new GridBagLayout());
 	JPanel panGridLog2 = new JPanel(new GridBagLayout());
 	GridBagConstraints gc = new GridBagConstraints();
 	GridBagConstraints gc2 = new GridBagConstraints();
 	TableModel modele;
 	JTable table;
+	Offres o, o2;
+	Date date;
+	DateFormat formatter;
+	String date2;
+	Utilisateur user;
+	Entreprise entr;
+	int duree, idO, idE;
+	
 	List<Offres> listOffres = new ArrayList<Offres>();
+	List<Integer> listId = new ArrayList<Integer>();
 	void createAndShowGUIEtu(Utilisateur user) {
-
 		JXTabbedPane tabbedPane = new JXTabbedPane(JTabbedPane.LEFT);
 		AbstractTabRenderer renderer = (AbstractTabRenderer)tabbedPane.getTabRenderer();
 		renderer.setPrototypeText("This text is a prototype");
@@ -143,10 +163,19 @@ public class Profil {
 		gc2.gridy = 2;
 		panGridLog2.add(cv,gc2);
 		
-		OffresDaoImpl Offres = new OffresDaoImpl();
+		int i =0;
+		UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
+		OffresDaoImpl odi = new OffresDaoImpl();
+		ListOffresDaoImpl ldi = new ListOffresDaoImpl();
 		try {
-			//taille = Offres.listOffreAll().size();
-			listOffres = Offres.listOffreAll();
+			i = udi.recupUtilisateurById(user);
+			setListId(ldi.recupListOffresByID(i));
+			System.out.println("maliste: "+getListId());
+			for (Iterator<Integer> iter = getListId().iterator(); iter.hasNext();){
+				int a = iter.next();
+				getListOffres().add(odi.recupOffre(a));
+			}
+			//listOffres = odi.listOffreAllByIdOffre(getListId());
 		} catch (DAOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -158,6 +187,46 @@ public class Profil {
 		modele = new TableModel(getListOffres());
 		table = new JTable(modele);		
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		p2.add(visu, BorderLayout.SOUTH);
+		p2.add(new JScrollPane(table), BorderLayout.CENTER);
+		
+		visu.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				int selection = table.getSelectedRow();
+				setDuree((int) table.getValueAt(selection, 4));
+				formatter = new SimpleDateFormat("YYYY-MM-DD");
+				date = new Date();
+				setDate2(table.getValueAt(selection, 3).toString());
+				try {
+					setDate(getFormatter().parse(getDate2()));
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				o = new Offres((String) table.getValueAt(selection, 0),
+						(String) table.getValueAt(selection, 1),
+						(String) table.getValueAt(selection, 2),
+						getDate(),
+						getDuree(),
+						(String) table.getValueAt(selection, 5));
+				OffresDaoImpl odi = new OffresDaoImpl();
+				UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
+				try {
+					setUser(udi.recupUtilisateur(user));
+					setIdO(odi.idOffres(o));
+					setIdE(odi.recupOffreIdEntr(getIdO()));
+				} catch (DAOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				new ConsultFrame(getUser(), getIdO());
+			}
+		});
 
 		tabbedPane.addTab("Informations", UIManager.getIcon("OptionPane.informationIcon"), panGridLog, "Information tool tip");
 		tabbedPane.addTab("Demandes de Stage", UIManager.getIcon("OptionPane.warningIcon"), p2, "Warning tool tip");
@@ -256,6 +325,7 @@ public class Profil {
 			}
 		});
 	}
+	
 
 	void createAndShowGUIEnt(Utilisateur user, Entreprise ent) {
 
@@ -263,10 +333,6 @@ public class Profil {
 		AbstractTabRenderer renderer = (AbstractTabRenderer)tabbedPane.getTabRenderer();
 		renderer.setPrototypeText("This text is a prototype");
 		renderer.setHorizontalTextAlignment(SwingConstants.LEADING);
-		JPanel p1 = new JPanel(new FlowLayout());
-		JPanel p2 = new JPanel(new FlowLayout());
-		JPanel p3 = new JPanel(new FlowLayout());
-		p1.setPreferredSize(new Dimension(400, 300));
 		p2.setPreferredSize(new Dimension(400, 300));
 		p3.setPreferredSize(new Dimension(400, 300));
 
@@ -416,10 +482,78 @@ public class Profil {
 		gc2.gridx = 1;
 		gc2.gridy = 8;
 		panGridLog2.add(vSect,gc2);*/
+		Entreprise i2 = null;
+		int i3 = 0;
+		EntrepriseDaoImpl edi = new EntrepriseDaoImpl();
+		OffresDaoImpl odi2 = new OffresDaoImpl();
+		ListOffresDaoImpl ldi2 = new ListOffresDaoImpl();
+		try {
+			i2 = edi.userEntreprise(user);
+			System.out.println("l'ID user: "+i2.getId());
+			i3 = i2.getId();
+			setListId(ldi2.recupListOffresByID(i3));
+			System.out.println("maliste: "+getListId());
+			for (Iterator<Integer> iter = getListId().iterator(); iter.hasNext();){
+				int a = iter.next();
+				getListOffres().add(odi2.recupOffre(a));
+			}
+			//listOffres = ldi2.recupListOffresByID(getListId());
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		modele = new TableModel(getListOffres());
+		table = new JTable(modele);		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		p3.add(new JScrollPane(table), BorderLayout.CENTER);
+		p3.add(visu, BorderLayout.SOUTH);
+		
+		visu.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				/*int selection = table.getSelectedRow();
+				setDuree((int) table.getValueAt(selection, 4));
+				formatter = new SimpleDateFormat("YYYY-MM-DD");
+				date = new Date();
+				setDate2(table.getValueAt(selection, 3).toString());
+				try {
+					setDate(getFormatter().parse(getDate2()));
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				o = new Offres((String) table.getValueAt(selection, 0),
+						(String) table.getValueAt(selection, 1),
+						(String) table.getValueAt(selection, 2),
+						getDate(),
+						getDuree(),
+						(String) table.getValueAt(selection, 5));
+				OffresDaoImpl odi = new OffresDaoImpl();
+				UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
+				try {
+					setUser(udi.recupUtilisateur(user));
+					setIdO(odi.idOffres(o));
+					setIdE(odi.recupOffreIdEntr(getIdO()));
+				} catch (DAOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				new ConsultFrame(getUser(), getIdO());*/
+				new VisuProfilCandidat();
+			}
+		});
 
 		tabbedPane.addTab("Informations", UIManager.getIcon("OptionPane.informationIcon"), panGridLog, "Information tool tip");
-		tabbedPane.addTab("Demandes de Stage", UIManager.getIcon("OptionPane.warningIcon"), p2, "Warning tool tip");
-		tabbedPane.addTab("Parametres", UIManager.getIcon("OptionPane.errorIcon"), p3, "Error tool tip");
+		tabbedPane.addTab("Demandes de Stage", UIManager.getIcon("OptionPane.warningIcon"), p3, "Warning tool tip");
+		tabbedPane.addTab("Parametres", UIManager.getIcon("OptionPane.errorIcon"), p4, "Error tool tip");
 
 		JFrame frame = new JFrame("Profil");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -628,6 +762,94 @@ public class Profil {
 
 	public void setListOffres(List<Offres> listOffres) {
 		this.listOffres = listOffres;
+	}
+
+	public List<Integer> getListId() {
+		return listId;
+	}
+
+	public void setListId(List<Integer> listId) {
+		this.listId = listId;
+	}
+
+	public Offres getO() {
+		return o;
+	}
+
+	public void setO(Offres o) {
+		this.o = o;
+	}
+
+	public Offres getO2() {
+		return o2;
+	}
+
+	public void setO2(Offres o2) {
+		this.o2 = o2;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public DateFormat getFormatter() {
+		return formatter;
+	}
+
+	public void setFormatter(DateFormat formatter) {
+		this.formatter = formatter;
+	}
+
+	public String getDate2() {
+		return date2;
+	}
+
+	public void setDate2(String date2) {
+		this.date2 = date2;
+	}
+
+	public Utilisateur getUser() {
+		return user;
+	}
+
+	public void setUser(Utilisateur user) {
+		this.user = user;
+	}
+
+	public Entreprise getEntr() {
+		return entr;
+	}
+
+	public void setEntr(Entreprise entr) {
+		this.entr = entr;
+	}
+
+	public int getDuree() {
+		return duree;
+	}
+
+	public void setDuree(int duree) {
+		this.duree = duree;
+	}
+
+	public int getIdO() {
+		return idO;
+	}
+
+	public void setIdO(int idO) {
+		this.idO = idO;
+	}
+
+	public int getIdE() {
+		return idE;
+	}
+
+	public void setIdE(int idE) {
+		this.idE = idE;
 	}
 
 	class DefaultTabRenderer extends AbstractTabRenderer implements PropertyChangeListener {

@@ -19,10 +19,10 @@ public class OffresDaoImpl implements OffresDao{
 			String SQL_INSERT = "INSERT INTO Offres (idEntreprise, NomEnt, Domaine, Libelle, Date, Duree, Descriptif)"
 					+ " VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE idEntreprise=idEntreprise"; 
 			state = SingletonBDD.getInstance().prepareStatement(SQL_INSERT);
-			
+
 			Date date = new Date(Offre.getDate().getTime());
 			System.out.println(date);
-			
+
 			state.setInt(1, entrepriseId);
 			state.setString(2, entreprise.getNom());
 			state.setString(3, Offre.getDomaine());
@@ -31,9 +31,9 @@ public class OffresDaoImpl implements OffresDao{
 			state.setInt(6, Offre.getDuree());
 			state.setString(7, Offre.getDescriptif());
 			state.executeUpdate();
-			
-	        System.out.println("Offre ajouté!");
-	        //state.close();
+
+			System.out.println("Offre ajouté!");
+			//state.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -51,7 +51,7 @@ public class OffresDaoImpl implements OffresDao{
 			state = SingletonBDD.getInstance().prepareStatement(SQL_DELETE);
 			state.setInt(1, Offre.getIdOffre());
 			state.executeUpdate();
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -60,7 +60,7 @@ public class OffresDaoImpl implements OffresDao{
 				state.close();
 			}
 		}
-		
+
 	}
 
 	public List<Offres> listOffre(Entreprise entreprise) throws DAOException, SQLException {
@@ -80,7 +80,7 @@ public class OffresDaoImpl implements OffresDao{
 				offre.setIdOffre(rs.getInt(1));
 				listOffres.add(offre);
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class OffresDaoImpl implements OffresDao{
 		}
 		return listOffres;
 	}
-	
+
 	public List<Offres> listOffreUser() throws DAOException, SQLException {
 		List<Offres> listOffres = new ArrayList<Offres>();
 		try {
@@ -105,7 +105,6 @@ public class OffresDaoImpl implements OffresDao{
 				offre.setIdOffre(rs.getInt(1));
 				listOffres.add(offre);
 			}
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -116,7 +115,7 @@ public class OffresDaoImpl implements OffresDao{
 		}
 		return listOffres;
 	}
-	
+
 	public Offres recupOffre(int idOffre) throws DAOException, SQLException {
 		Offres offre = null;
 		try {
@@ -139,7 +138,29 @@ public class OffresDaoImpl implements OffresDao{
 		}
 		return offre;
 	}
-	
+	public int recupOffreIdEntr(int id) throws DAOException, SQLException {
+		int i=0;
+		try {
+			final String SQL_SELECT = "SELECT idOffre, idEntreprise"
+					+ " FROM offres"
+					+ " WHERE idOffre = ?";
+			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
+			state.setInt(1, id);
+			ResultSet rs = state.executeQuery();
+			if(rs.next()){
+				i=rs.getInt(2);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(state!=null){
+				state.close();
+			}
+		}
+		return i;
+	}
+
 	public int idOffres(Offres offr) throws DAOException, SQLException {
 		int id =0;
 		try {
@@ -148,7 +169,7 @@ public class OffresDaoImpl implements OffresDao{
 			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
 
 			Date date = new Date(offr.getDate().getTime());
-			
+
 			state.setString(1, offr.getNomEnt());
 			state.setString(2, offr.getDomaine());
 			state.setString(3, offr.getLibelle());
@@ -171,7 +192,7 @@ public class OffresDaoImpl implements OffresDao{
 		}
 		return id;
 	}
-	
+
 	public List<Offres> listOffreAll() throws DAOException, SQLException {
 		List<Offres> listOffres = new ArrayList<Offres>();
 		try {
@@ -182,7 +203,6 @@ public class OffresDaoImpl implements OffresDao{
 				Offres offre = new Offres(rs.getString(1),rs.getString(2),rs.getString(3),rs.getDate(4),rs.getInt(5),rs.getString(6));
 				listOffres.add(offre);
 			}
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -210,7 +230,7 @@ public class OffresDaoImpl implements OffresDao{
 				offre.setIdEntreprise(rs.getInt(2));
 				list.add(offre);
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

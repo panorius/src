@@ -14,27 +14,27 @@ import javax.swing.ImageIcon;
 public class UtilisateurDaolmpl implements UtilisateurDao {
 
 	private static java.sql.PreparedStatement state;
-	
+
 	@Override
 	public void creer(Utilisateur utilisateur) throws NoSuchAlgorithmException, SQLException {
 		try {
 			String SQL_INSERT = "INSERT INTO Utilisateur (nom, mdp, mail,role)"
 					+ " VALUES (?,?,?,?)";
-			
+
 			byte[] msgdigest;
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			msgdigest = md5.digest(utilisateur.getMdp().getBytes());
 			BigInteger number = new BigInteger(1,msgdigest);
 			String hashtext = number.toString(16);
-			
+
 			state = SingletonBDD.getInstance().prepareStatement(SQL_INSERT);
 			state.setString(1, utilisateur.getNom());
 			state.setString(2, hashtext);
 			state.setString(3, utilisateur.getMail());
 			state.setInt(4, utilisateur.getRole());
-	        state.executeUpdate();  // execute la commmande SQL
+			state.executeUpdate();  // execute la commmande SQL
 
-	        System.out.println("Infos Utilisateur ajouté!");
+			System.out.println("Infos Utilisateur ajouté!");
 		} catch (SQLException e) {
 			if(e instanceof SQLIntegrityConstraintViolationException){ //On récupére l'exception quand deux utilisateur utilise le même nom.
 				System.out.println("Utilisateur déjà pris");
@@ -49,17 +49,17 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			}
 		}
 	}
-	
+
 	public void ajoutCv(FileInputStream image) throws NoSuchAlgorithmException, SQLException {
 		try {
 			String SQL_INSERT = "INSERT INTO Utilisateur (image)"
 					+ " VALUES (?)";
-			
+
 			state = SingletonBDD.getInstance().prepareStatement(SQL_INSERT);
 			state.setBinaryStream(1, image);
-	        state.executeUpdate();  // execute la commmande SQL
+			state.executeUpdate();  // execute la commmande SQL
 
-	        System.out.println("Infos Utilisateur ajouté!");
+			System.out.println("Infos Utilisateur ajouté!");
 		} catch (SQLException e) {
 			if(e instanceof SQLIntegrityConstraintViolationException){ //On récupére l'exception quand deux utilisateur utilise le même nom.
 				System.out.println("Utilisateur déjà pris");
@@ -74,18 +74,18 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			}
 		}
 	}
-	
+
 	public void ajoutOffres(Utilisateur user, int offre) throws NoSuchAlgorithmException, SQLException {
 		try {
 			String SQL_INSERT = "INSERT INTO Utilisateur (listOffres)"
 					+ " VALUES (?) WHERE idUtilisateur = ?";
-			
+
 			state = SingletonBDD.getInstance().prepareStatement(SQL_INSERT);
 			state.setInt(1, offre);
 			state.setInt(2, user.getId());
-	        state.executeUpdate();  // execute la commmande SQL
+			state.executeUpdate();  // execute la commmande SQL
 
-	        System.out.println("Infos Utilisateur ajouté!");
+			System.out.println("Infos Utilisateur ajouté!");
 		} catch (SQLException e) {
 			if(e instanceof SQLIntegrityConstraintViolationException){ //On récupére l'exception quand deux utilisateur utilise le même nom.
 				System.out.println("Utilisateur déjà pris");
@@ -111,7 +111,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			msgdigest = md5.digest(utilisateur.getMdp().getBytes());
 			BigInteger number = new BigInteger(1,msgdigest);
 			String hashtext = number.toString(16); // Mot de passe de l'utilisateur en arg en MD5
-			
+
 			// Methode prepareStatement à utiliser.
 			final String SQL_SELECT = "SELECT mdp, mail, role FROM Utilisateur WHERE mdp = ? AND mail = ? AND role = ?";
 			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
@@ -121,7 +121,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			ResultSet result = state.executeQuery();
 			if(result.next()){
 				if(result.getObject(2).equals(utilisateur.getMail()) && result.getObject(1).equals(hashtext)){ //on verifie que le mot de passe et l'utilisateur sont équivalent
-					 user = true;
+					user = true;
 				}System.out.println(result.getObject(2)+" "+result.getObject(1)+" "+result.getObject(3));
 			}
 			result.close();
@@ -143,7 +143,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			msgdigest = md5.digest(utilisateur.getMdp().getBytes());
 			BigInteger number = new BigInteger(1,msgdigest);
 			String hashtext = number.toString(16); // Mot de passe de l'utilisateur en arg en MD5
-			
+
 			// Methode prepareStatement à utiliser.
 			final String SQL_SELECT = "SELECT idUtilisateur, nom ,mdp, mail, role FROM Utilisateur WHERE mdp = ? AND mail = ? AND role = ?";
 			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
@@ -168,6 +168,37 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			}
 		}
 		return null;
+	}
+	public int recupUtilisateurById(Utilisateur utilisateur) throws SQLException{
+		int i = 0;
+		try {
+			//Convertir le mot de passe de l'utilisateur pour pouvoir comparer les mdp
+			byte[] msgdigest;
+			MessageDigest md5 = MessageDigest.getInstance("MD5");
+			msgdigest = md5.digest(utilisateur.getMdp().getBytes());
+			BigInteger number = new BigInteger(1,msgdigest);
+			String hashtext = number.toString(16); // Mot de passe de l'utilisateur en arg en MD5
+
+			// Methode prepareStatement à utiliser.
+			final String SQL_SELECT = "SELECT idUtilisateur FROM Utilisateur WHERE mdp = ? AND mail = ? AND role = ?";
+			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
+			state.setString(1, hashtext);
+			state.setString(2, utilisateur.getMail());
+			state.setInt(3, utilisateur.getRole());
+			ResultSet result = state.executeQuery();
+			if(result.next()){
+				i = result.getInt(1);
+			}
+			result.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(state!=null){
+				state.close();
+			}
+		}
+		return i;
 	}
 	public boolean isEntCreer(Utilisateur utilisateur) throws SQLException { // Connexion 
 		boolean creer = false;
@@ -232,7 +263,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			msgdigest = md5.digest(mdp.getBytes());
 			BigInteger number = new BigInteger(1,msgdigest);
 			String hashtext = number.toString(16); // Mot de passe de l'utilisateur en arg en MD5
-			
+
 			final String SQL_UPDATE = "UPDATE utilisateur SET mdp = ? WHERE mail = ?";
 			state = SingletonBDD.getInstance().prepareStatement(SQL_UPDATE);
 			state.setString(1, hashtext);
@@ -254,7 +285,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			state = SingletonBDD.getInstance().prepareStatement(SQL_UPDATE);
 			state.setString(1, utilisateur.getMail());
 			state.executeUpdate();
-			
+
 			System.out.println("Creation de l'entreprise réussi !");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -275,7 +306,7 @@ public class UtilisateurDaolmpl implements UtilisateurDao {
 			msgdigest = md5.digest(utilisateur.getMdp().getBytes());
 			BigInteger number = new BigInteger(1,msgdigest);
 			String hashtext = number.toString(16); // Mot de passe de l'utilisateur en arg en MD5
-			
+
 			final String SQL_DELETE = "DELETE FROM utilisateur WHERE nom = ? AND mdp = ? AND mail = ? ";
 			state = SingletonBDD.getInstance().prepareStatement(SQL_DELETE);
 			state.setString(1, utilisateur.getNom());

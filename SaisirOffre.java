@@ -173,7 +173,12 @@ public class SaisirOffre extends Frame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new EssaiChoixFichier();
+				try {
+					new EssaiChoixFichier(tSaveOffre.getText());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		super.retour.addActionListener(new ActionListener(){

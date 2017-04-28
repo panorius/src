@@ -21,7 +21,7 @@ public class Entreprise {
 		this.tel = tel;
 		this.secteur = secteur;
 	}
-	public Entreprise( String nom, String numRue, int cPostal, String Ville, String mail, String tel, String secteur){
+	public Entreprise(String nom, String numRue, int cPostal, String Ville, String mail, String tel, String secteur){
 		this.id=0;
 		this.idUtilisateur=0;
 		this.nom = nom;

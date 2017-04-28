@@ -39,16 +39,16 @@ public class ConsultFrame extends Frame{
 	private Entreprise entr;
 	private Offres offre;
 	private JPanel p;
-	private int idof, iduser;
+	private int idof, iduser, idEntr;
 	private JTextArea ta = new JTextArea(10,30);
 	private JLabel libelle, duree, nomEnt;
 	
-	public ConsultFrame(Utilisateur user,int idUser, int idOffre, int idEntr){
+	public ConsultFrame(Utilisateur user, int idOffre, int idEntr){
 		super();
-		EntrepriseDaoImpl edi = new EntrepriseDaoImpl();
+		setIdEntr(idEntr);
 		OffresDaoImpl odi = new OffresDaoImpl();
 		try {
-			setEntr(edi.userEntreprise(getUtilisateur()));
+			//setEntr(edi.userEntreprise(getUtilisateur()));
 			setOffre(odi.recupOffre(idOffre));
 		} catch (DAOException e1) {
 			// TODO Auto-generated catch block
@@ -58,7 +58,7 @@ public class ConsultFrame extends Frame{
 			e1.printStackTrace();
 		}
 ;		setUtilisateur(user);
-		setIduser(idUser);
+		setIduser(user.getId());
 		setIdof(idOffre);
 		SimpleDateFormat sdf = new SimpleDateFormat("EEEEEE d MMM yyyy");
 		String s = sdf.format(getOffre().getDate());
@@ -111,7 +111,7 @@ public class ConsultFrame extends Frame{
 				
 				try {
 					System.out.println(getUtilisateur()+" TRY "+getIdof());
-					lod.creer(getIduser(), getIdof(), getEntr().getId());
+					lod.creer(getIduser(), getIdof(), getIdEntr());
 				} catch (SQLException | DAOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -123,7 +123,70 @@ public class ConsultFrame extends Frame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new ConsultOffre(getUtilisateur());
+				setVisible(false);
+			}
+		});
+	}
+	
+	public ConsultFrame(Utilisateur user, int idOffre){
+		super();
+		setIdEntr(idEntr);
+		OffresDaoImpl odi = new OffresDaoImpl();
+		try {
+			//setEntr(edi.userEntreprise(getUtilisateur()));
+			setOffre(odi.recupOffre(idOffre));
+		} catch (DAOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+;		setUtilisateur(user);
+		setIduser(user.getId());
+		setIdof(idOffre);
+		SimpleDateFormat sdf = new SimpleDateFormat("EEEEEE d MMM yyyy");
+		String s = sdf.format(getOffre().getDate());
+		this.ta.setText(getOffre().getDescriptif());
+		Border brd = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.CYAN);
+		JScrollPane scroll = new JScrollPane(this.ta,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setBorder(brd);
+		this.p = new JPanel(new GridBagLayout());
+		this.ta.setEditable(false);
+		this.ta.setWrapStyleWord(true);
+		this.ta.setLineWrap(true);
+		this.libelle = new JLabel(getOffre().getLibelle());
+		this.libelle.setFont(new Font("Tahoma", 1, 35));
+		this.nomEnt = new JLabel("L'entreprise "+getOffre().getNomEnt()+"\n"
+				+" dans le domaine: "+ getOffre().getDomaine());
+		this.nomEnt.setFont(new Font("Tahoma", 1, 20));
+		this.duree = new JLabel("durée: "+getOffre().getDuree()+" mois à partir du: "+s);
+		GridBagConstraints gbc = new GridBagConstraints();
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		this.p.add(this.nomEnt, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		this.p.add(this.duree, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		this.p.add(scroll, gbc);
+		
+		super.envoyer.setText("Postuler");
+		super.retour.setText("Fermer");
+		super.add(center, BorderLayout.NORTH);
+		super.add(this.p, BorderLayout.CENTER);
+		super.add(center3, BorderLayout.SOUTH); 
+		super.center.add(this.libelle);
+		super.center3.add(bottomButton);
+		super.bottomButton.add(retour);
+		//System.out.println("User ConsultFrame: "+getUtilisateur().toString());
+		super.retour.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
 				setVisible(false);
 			}
 		});
@@ -161,5 +224,13 @@ public class ConsultFrame extends Frame{
 
 	public void setEntr(Entreprise entr) {
 		this.entr = entr;
+	}
+
+	public int getIdEntr() {
+		return idEntr;
+	}
+
+	public void setIdEntr(int idEntr) {
+		this.idEntr = idEntr;
 	}
 }

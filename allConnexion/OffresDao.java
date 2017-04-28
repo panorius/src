@@ -13,5 +13,10 @@ public interface OffresDao {
 	public List<Offres> listDomaine(String domaine) throws DAOException;
 	public List<Offres> listLibelle(String Libelle) throws DAOException;
 	public List<Offres> listDuree(int durée) throws DAOException;
+	public List<Offres> listOffreUser() throws DAOException, SQLException;
+	public Offres recupOffre(int idOffre) throws DAOException, SQLException;
+	public int recupOffreIdEntr(int id) throws DAOException, SQLException;
+	public int idOffres(Offres offr) throws DAOException, SQLException;
+	public List<Offres> listOffreAll() throws DAOException, SQLException;
 	
 }
