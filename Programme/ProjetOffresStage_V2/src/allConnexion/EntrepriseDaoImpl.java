@@ -15,7 +15,6 @@ public class EntrepriseDaoImpl implements EntrepriseDao{
 					+ " VALUES (?,?,?,?,?,?,?,?)";
 			
 			state = SingletonBDD.getInstance().prepareStatement(SQL_INSERT);
-<<<<<<< HEAD
 			state.setInt(1, User.recupUtilisateur(user).getId());
 			state.setString(2, entreprise.getNom());
 			state.setString(3, entreprise.getNumRue());
@@ -24,15 +23,6 @@ public class EntrepriseDaoImpl implements EntrepriseDao{
 			state.setString(6, entreprise.getMail());
 			state.setString(7, entreprise.getTel());
 			state.setString(8, entreprise.getSecteur());
-=======
-			state.setString(1, entreprise.getNom());
-			state.setString(2, entreprise.getNumRue());
-			state.setString(3, entreprise.getVille());
-			state.setInt(4, entreprise.getcPostal());
-			state.setString(5, entreprise.getMail());
-			state.setString(6, entreprise.getTel());
-			state.setString(7, entreprise.getSecteur());
->>>>>>> refs/remotes/LyricU/Cyril
 			state.executeUpdate();
 			
 	        System.out.println("Infos entreprise ajouté!");
@@ -51,19 +41,20 @@ public class EntrepriseDaoImpl implements EntrepriseDao{
 	public Entreprise userEntreprise(Utilisateur user) throws DAOException, SQLException{
 		try {
 			UtilisateurDaolmpl User = new UtilisateurDaolmpl();
-			final String SQL_SELECT = "SELECT idEntreprise, idUtilisateur, nom, numRue, ville, cPostal, mail, tel, secteur "
-					+ "FROM Entreprise "
+			final String SQL_SELECT = "SELECT idEntreprise, nom, numRue, ville, cPostal, mail, tel, secteur "
+					+ "FROM entreprise "
 					+ "WHERE idUtilisateur = ?";
 			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
 			state.setInt(1, User.recupUtilisateur(user).getId());
 			ResultSet result = state.executeQuery();
-			
+			System.out.println("TEST:"+User.recupUtilisateur(user).getId());
 			if(result.next()){
-				Entreprise entrepriseTrouver = new Entreprise(result.getInt(1),result.getString(3),result.getString(4),
-						result.getInt(6),result.getString(5),result.getString(7),result.getString(8),
-						result.getString(9));
-				entrepriseTrouver.setId(result.getInt(1));
-				entrepriseTrouver.setIdUtilisateur(result.getInt(2));
+				Entreprise entrepriseTrouver = new Entreprise(result.getInt(1),result.getString(2),result.getString(3),
+						result.getInt(5),result.getString(4),result.getString(6),result.getString(7),
+						result.getString(8));
+				//entrepriseTrouver.setId(result.getInt(1));
+				//entrepriseTrouver.setIdUtilisateur(result.getInt(2));
+				System.out.println("TEST2:"+entrepriseTrouver.toString());
 				return entrepriseTrouver;
 			}
 			
