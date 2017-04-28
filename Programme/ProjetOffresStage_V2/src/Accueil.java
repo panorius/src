@@ -64,9 +64,9 @@ public class Accueil extends JFrame {
 		JButton envoyer = new JButton("Envoyer");
 
 		JLabel luser = new JLabel("Utilisateur:");
-		tNom = new JTextField("m");
+		tNom = new JTextField("j");
 		JLabel lmail = new JLabel("Mail:");
-		tMail = new JTextField("m@");
+		tMail = new JTextField("j@");
 		JLabel lmdp = new JLabel("Mot de passe:");
 		JPasswordField tMdp = new JPasswordField("123");
 		JLabel lqui = new JLabel("Vous êtes:");

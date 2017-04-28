@@ -45,6 +45,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import allConnexion.DAOException;
 import allConnexion.Entreprise;
+import allConnexion.EntrepriseDaoImpl;
 import allConnexion.ListOffresDaoImpl;
 import allConnexion.Offres;
 import allConnexion.OffresDaoImpl;
@@ -68,6 +69,8 @@ public class Profil {
 			cNom = new JLabel("Nom: "),
 			cMail = new JLabel("Mail: ");
 	JPanel p2 = new JPanel(new BorderLayout());
+	JPanel p3 = new JPanel(new BorderLayout());
+	JPanel p4 = new JPanel(new FlowLayout());
 	JPanel panGridLog = new JPanel(new GridBagLayout());
 	JPanel panGridLog2 = new JPanel(new GridBagLayout());
 	GridBagConstraints gc = new GridBagConstraints();
@@ -322,6 +325,7 @@ public class Profil {
 			}
 		});
 	}
+	
 
 	void createAndShowGUIEnt(Utilisateur user, Entreprise ent) {
 
@@ -329,10 +333,6 @@ public class Profil {
 		AbstractTabRenderer renderer = (AbstractTabRenderer)tabbedPane.getTabRenderer();
 		renderer.setPrototypeText("This text is a prototype");
 		renderer.setHorizontalTextAlignment(SwingConstants.LEADING);
-		JPanel p1 = new JPanel(new FlowLayout());
-		JPanel p2 = new JPanel(new FlowLayout());
-		JPanel p3 = new JPanel(new FlowLayout());
-		p1.setPreferredSize(new Dimension(400, 300));
 		p2.setPreferredSize(new Dimension(400, 300));
 		p3.setPreferredSize(new Dimension(400, 300));
 
@@ -482,10 +482,78 @@ public class Profil {
 		gc2.gridx = 1;
 		gc2.gridy = 8;
 		panGridLog2.add(vSect,gc2);*/
+		Entreprise i2 = null;
+		int i3 = 0;
+		EntrepriseDaoImpl edi = new EntrepriseDaoImpl();
+		OffresDaoImpl odi2 = new OffresDaoImpl();
+		ListOffresDaoImpl ldi2 = new ListOffresDaoImpl();
+		try {
+			i2 = edi.userEntreprise(user);
+			System.out.println("l'ID user: "+i2.getId());
+			i3 = i2.getId();
+			setListId(ldi2.recupListOffresByID(i3));
+			System.out.println("maliste: "+getListId());
+			for (Iterator<Integer> iter = getListId().iterator(); iter.hasNext();){
+				int a = iter.next();
+				getListOffres().add(odi2.recupOffre(a));
+			}
+			//listOffres = ldi2.recupListOffresByID(getListId());
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		modele = new TableModel(getListOffres());
+		table = new JTable(modele);		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		p3.add(new JScrollPane(table), BorderLayout.CENTER);
+		p3.add(visu, BorderLayout.SOUTH);
+		
+		visu.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				/*int selection = table.getSelectedRow();
+				setDuree((int) table.getValueAt(selection, 4));
+				formatter = new SimpleDateFormat("YYYY-MM-DD");
+				date = new Date();
+				setDate2(table.getValueAt(selection, 3).toString());
+				try {
+					setDate(getFormatter().parse(getDate2()));
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				o = new Offres((String) table.getValueAt(selection, 0),
+						(String) table.getValueAt(selection, 1),
+						(String) table.getValueAt(selection, 2),
+						getDate(),
+						getDuree(),
+						(String) table.getValueAt(selection, 5));
+				OffresDaoImpl odi = new OffresDaoImpl();
+				UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
+				try {
+					setUser(udi.recupUtilisateur(user));
+					setIdO(odi.idOffres(o));
+					setIdE(odi.recupOffreIdEntr(getIdO()));
+				} catch (DAOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				new ConsultFrame(getUser(), getIdO());*/
+				new VisuProfilCandidat();
+			}
+		});
 
 		tabbedPane.addTab("Informations", UIManager.getIcon("OptionPane.informationIcon"), panGridLog, "Information tool tip");
-		tabbedPane.addTab("Demandes de Stage", UIManager.getIcon("OptionPane.warningIcon"), p2, "Warning tool tip");
-		tabbedPane.addTab("Parametres", UIManager.getIcon("OptionPane.errorIcon"), p3, "Error tool tip");
+		tabbedPane.addTab("Demandes de Stage", UIManager.getIcon("OptionPane.warningIcon"), p3, "Warning tool tip");
+		tabbedPane.addTab("Parametres", UIManager.getIcon("OptionPane.errorIcon"), p4, "Error tool tip");
 
 		JFrame frame = new JFrame("Profil");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

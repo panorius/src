@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 
 class EssaiChoixFichier {
-	public static void main(String[] arg) throws IOException {
+	public EssaiChoixFichier(String i) throws IOException{
+		
 		JFileChooser dialogue = new JFileChooser(new File("."));
 		PrintWriter sortie;
 		File fichier;
@@ -15,7 +16,7 @@ class EssaiChoixFichier {
 			fichier = dialogue.getSelectedFile();
 			sortie = new PrintWriter
 					(new FileWriter(fichier.getPath(), true));
-			sortie.println(arg[0]);
+			sortie.println(i);
 			sortie.close();
 		}
 	}

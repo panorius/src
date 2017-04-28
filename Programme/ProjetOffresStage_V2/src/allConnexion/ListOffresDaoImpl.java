@@ -74,4 +74,9 @@ public class ListOffresDaoImpl implements ListOffresDao{
 			}
 		}
 	}
+	@Override
+	public void supprimer(Entreprise entreprise) throws DAOException, SQLException {
+		// TODO Auto-generated method stub
+		
+	}
 }

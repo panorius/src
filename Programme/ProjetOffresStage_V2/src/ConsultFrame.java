@@ -123,7 +123,6 @@ public class ConsultFrame extends Frame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new ConsultOffre(getUtilisateur());
 				setVisible(false);
 			}
 		});
