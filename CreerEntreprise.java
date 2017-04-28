@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.text.ParseException;
 
 import javax.swing.JButton;
@@ -17,37 +18,33 @@ import javax.swing.text.MaskFormatter;
 import allConnexion.*;
 
 
-public class CreerEntreprise extends JFrame{
+public class CreerEntreprise extends Frame{
 
-	private int qui;
+	Utilisateur user;
 	
-	BorderLayout border = new BorderLayout();
-	JButton envoyer = new JButton("Envoyer");
-	JButton retour = new JButton("Retour");
-	JLabel titre = new JLabel("CREATION D'UNE ENTREPRISE");
-	JPanel center = new JPanel(new FlowLayout());
-	JPanel center2 = new JPanel(new FlowLayout());
-	JPanel center3 = new JPanel(new FlowLayout());
-	JPanel nameField = new JPanel(new GridLayout(8,2));
-	JPanel bottomButton = new JPanel(new GridLayout(1,2, 50, 0));
+	private JPanel nameField = new JPanel(new GridLayout(10,2));
 	
-	private JLabel lNomEnt = new JLabel("Nom de l'entreprise:");
-	private JLabel lAdresse = new JLabel("Adresse(Numero et rue):");
-	private JLabel lCp = new JLabel("Code Postale:");
-	private JLabel lVille = new JLabel("Ville:");
-	private JLabel lMail = new JLabel("Mail du contact:");
-	private JLabel lTel = new JLabel("Telephone du contact:");
-	private JLabel lSecteurEnt = new JLabel("Secteur d'activité de l'entreprise:");
+	private JLabel titre = new JLabel("CREATION D'UNE ENTREPRISE"),
+			lNomEnt = new JLabel("Nom de l'entreprise:"),
+			lAdresse = new JLabel("Adresse(Numero et rue):"),
+			lCp = new JLabel("Code Postale:"),
+			lVille = new JLabel("Ville:"),
+			lMail = new JLabel("Mail du contact:"),
+			lTel = new JLabel("Telephone du contact:"),
+			lSecteurEnt = new JLabel("Secteur d'activité de l'entreprise:");
 	
-	private JTextField tNomEnt = new JTextField();
-	private JTextField tAdresse = new JTextField();
-	private MaskFormatter m = new MaskFormatter();
-	private MaskFormatter m2 = new MaskFormatter();
-	private JFormattedTextField tCp;
-	private JTextField tVille = new JTextField();
-	private JTextField tMail = new JTextField();
-	private JFormattedTextField tTel;
-	private JTextField tSecteurEnt = new JTextField();
+	private JTextField tNomEnt = new JTextField(),
+			tAdresse = new JTextField(),
+			tVille = new JTextField(),
+			tMail = new JTextField(),
+			tSecteurEnt = new JTextField();
+	
+	private MaskFormatter m = new MaskFormatter(),
+			m2 = new MaskFormatter();
+	
+	private JFormattedTextField tCp,
+			tTel;
+	
 /*	
 	private String nomEnt;//nom de l'entreprise
 	private String Adresse;//adresse(numero et rue)
@@ -58,24 +55,18 @@ public class CreerEntreprise extends JFrame{
 	private String secteurEnt;//secteur d'activitÃ© de l'entreprise
 */
 
-	public CreerEntreprise(int a){
-		super("Creation Entreprise");
-		this.qui = a;
+	public CreerEntreprise(Utilisateur user){
+		super();
+		setUser(user);
 		
-		//Conf
-		//border.setHgap(100);
-		border.setVgap(50);		
-		this.setLayout(border);
-		this.setSize(1000, 400);
-		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);             
-		this.setVisible(true);
+		System.out.println(getUser().getMail());
+		tMail.setText(getUser().getMail());
 		
-		//ConfObject
+		//Conf Item
 		titre.setFont(new Font("Tahoma", 1, 35));
 		try {
 			m.setMask("#####");
-			m2.setMask("##.##.##.##.##");
+			m2.setMask("##########");
 		} catch (ParseException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -83,16 +74,15 @@ public class CreerEntreprise extends JFrame{
 		tCp = new JFormattedTextField(m);
 		tTel = new JFormattedTextField(m2);
 		
-		//Add
-		this.add(center, BorderLayout.NORTH);
-		this.add(center2, BorderLayout.CENTER);
-		this.add(center3, BorderLayout.SOUTH); 
-		//this.add(retour, BorderLayout.SOUTH);
-		center.add(titre);
-		center2.add(nameField);
-		center3.add(bottomButton);
-		bottomButton.add(envoyer);
-		bottomButton.add(retour);
+		//Add Item
+		super.add(center, BorderLayout.NORTH);
+		super.add(center2, BorderLayout.CENTER);
+		super.add(center3, BorderLayout.SOUTH); 
+		super.center.add(titre);
+		super.center2.add(nameField);
+		super.center3.add(bottomButton);
+		super.bottomButton.add(envoyer);
+		super.bottomButton.add(deconnexion);
 		nameField.add(lNomEnt);
 		nameField.add(tNomEnt);
 		nameField.add(lAdresse);
@@ -108,37 +98,42 @@ public class CreerEntreprise extends JFrame{
 		nameField.add(lSecteurEnt);
 		nameField.add(tSecteurEnt);
 
-
-
 		//Actions
-		retour.addActionListener(new ActionListener(){
+		super.deconnexion.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new ChoixFrame(getQui());
+				new Accueil();
 				setVisible(false);
 			}
 		});
 		
-		envoyer.addActionListener(new ActionListener(){
+		super.envoyer.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				UtilisateurDaolmpl User = new UtilisateurDaolmpl();
 				EntrepriseDaoImpl business = new EntrepriseDaoImpl();
 				int i = Integer.parseInt(gettCp().getText());
 				Entreprise e = new Entreprise(gettNomEnt().getText(), gettAdresse().getText(), i, gettVille().getText(), gettMail().getText(), gettTel().getText(), gettSecteurEnt().getText());
 				try {
-					business.creer(e);
+					business.creer(e, getUser());
+					try {
+						User.uptdateEntCreer(getUser());
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				} catch (DAOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				new ChoixFrame(user);
 				setVisible(false);
 			}
 		});
 		
 	}
-
 	public JTextField gettNomEnt() {
 		return tNomEnt;
 	}
@@ -207,12 +202,10 @@ public class CreerEntreprise extends JFrame{
 	public void settSecteurEnt(JTextField tSecteurEnt) {
 		this.tSecteurEnt = tSecteurEnt;
 	}
-
-	public int getQui() {
-		return qui;
+	public Utilisateur getUser() {
+		return user;
 	}
-
-	public void setQui(int qui) {
-		this.qui = qui;
+	public void setUser(Utilisateur user) {
+		this.user = user;
 	}
 }

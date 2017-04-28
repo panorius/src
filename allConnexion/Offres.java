@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Offres {
 
-	private String Domaine, Libelle, Descriptif;
+	private String NomEnt, Domaine, Libelle, Descriptif;
 	private Date date;
 	private int duree,idEntreprise, idOffre;
 	private ArrayList<Utilisateur> listUtilisateur;
@@ -14,6 +14,28 @@ public class Offres {
 		this.listUtilisateur = new ArrayList<Utilisateur>();
 		this.idEntreprise=0;
 		this.idOffre=0;
+		this.Domaine = Domaine;
+		this.Libelle = Libelle;
+		this.date = date;
+		this.duree = duree;
+		this.Descriptif = Descriptif;
+	}
+	public Offres(int id, String NomEnt, String Domaine, String Libelle, Date date, int duree, String Descriptif){
+		this.listUtilisateur = new ArrayList<Utilisateur>();
+		this.idEntreprise=0;
+		this.idOffre=id;
+		this.NomEnt = NomEnt;
+		this.Domaine = Domaine;
+		this.Libelle = Libelle;
+		this.date = date;
+		this.duree = duree;
+		this.Descriptif = Descriptif;
+	}
+	public Offres(String NomEnt, String Domaine, String Libelle, Date date, int duree, String Descriptif){
+		this.listUtilisateur = new ArrayList<Utilisateur>();
+		this.idEntreprise=0;
+		this.idOffre=0;
+		this.NomEnt = NomEnt;
 		this.Domaine = Domaine;
 		this.Libelle = Libelle;
 		this.date = date;
@@ -81,5 +103,13 @@ public class Offres {
 
 	public void setDuree(int duree) {
 		this.duree = duree;
+	}
+
+	public String getNomEnt() {
+		return NomEnt;
+	}
+
+	public void setNomEnt(String nomEnt) {
+		NomEnt = nomEnt;
 	}
 }

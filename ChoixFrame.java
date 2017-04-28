@@ -8,35 +8,52 @@ import java.awt.GridLayout;
 import java.awt.MenuBar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import allConnexion.*;
 
 public class ChoixFrame extends JFrame {
-	
-	private int qui;
 
+	private Utilisateur user;
+	private Entreprise entr;
+
+	//JTabbedPane tp = new JTabbedPane(JTabbedPane.LEFT);
 	JButton bCreer = new JButton("Creer une entreprise");
-	JButton bSaisir = new JButton("Saisir Offres");
-	JButton bConsult = new JButton("Consulter Offre");
+	JButton bSaisir = new JButton("Saisir Offre");
+	JButton bConsult = new JButton("Consulter Offres");
 	JButton quitter = new JButton("Deconnexion");
-	JLabel titre = new JLabel("GESTION DES OFFRES DE STAGE");
+	JLabel titre = new JLabel();
+	JButton profil = new JButton();
 	JPanel bPan = new JPanel(new GridLayout(0,3));
 	JPanel center = new JPanel(new FlowLayout());
 	JPanel b1 = new JPanel(new FlowLayout());
 	BorderLayout border = new BorderLayout();
-	JButton profil = new JButton();
 	//JTable pour lister des objet d'une base de donnée IMPORTANT
 
-	public ChoixFrame(int a){
+	public ChoixFrame(Utilisateur user){
 		super("Accueil");
-		this.qui = a;
-		
+		setUser(user);
+
+		if(getUser().getRole() == 2){
+			EntrepriseDaoImpl Buisness = new EntrepriseDaoImpl();
+			try {
+				setEntr(Buisness.userEntreprise(user));
+			} catch (DAOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		//Conf
 		border.setVgap(100);
 		this.setLayout(border);
@@ -44,27 +61,35 @@ public class ChoixFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);             
 		this.setVisible(true);
+		System.out.println("User: "+getUser().toString());
 
 		//ConfObject
 		bCreer.setSize(300, 50);
 		titre.setFont(new Font("Tahoma", 1, 35));
-		profil.setIcon(new ImageIcon("C:\\Users\\Panorius\\Desktop\\img\\adminIcon.png"));
+		titre.setText("Bienvenue "+user.getNom());
+		//tp.addTab(null, new JPanel());
+		//tp.setTabComponentAt(0, profil);
+		profil.setIcon(new ImageIcon("C:\\Users\\PanoPort\\Desktop\\img\\icon-paper.png"));
 
 		//ADD
-		this.add(profil, BorderLayout.NORTH);
-		//this.add(center, BorderLayout.NORTH);
-		this.add(b1, BorderLayout.CENTER);
-		this.add(quitter, BorderLayout.SOUTH);
+		//this.add(titre, BorderLayout.NORTH);
+		super.add(center, BorderLayout.NORTH);
+		super.add(b1, BorderLayout.CENTER);
+		super.add(quitter, BorderLayout.SOUTH);
+		super.add(profil, BorderLayout.WEST);
 		center.add(titre);
-		if(a == 1){
+
+		System.out.println(user.getRole());
+
+		if(user.getRole() == 1){
 			b1.add(bConsult);
 		}
-		if(a == 2){
-			b1.add(bCreer);
+		if(user.getRole() == 2){
+			//b1.add(bCreer);
 			b1.add(bSaisir);
 			b1.add(bConsult);
 		}
-		if(a == 3){
+		if(user.getRole() == 3){
 			b1.add(bCreer);
 			b1.add(bSaisir);
 			b1.add(bConsult);
@@ -76,7 +101,8 @@ public class ChoixFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new CreerEntreprise(getQui());
+				new CreerEntreprise(getUser());
+				//new Frame("SAISIE D'UNE OFFRE DE STAGE", 7, 2);
 				setVisible(false);
 			}
 		});
@@ -84,7 +110,7 @@ public class ChoixFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new SaisirOffre(getQui());
+				new SaisirOffre(getUser(), getEntr());
 				setVisible(false);
 			}
 		});
@@ -92,10 +118,25 @@ public class ChoixFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new ConsultOffre(getQui());
+				System.out.println("id de l'user: "+getUser().getId());
+				new ConsultOffre(getUser());
 				setVisible(false);
 			}
 		});
+		profil.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(getUser().getRole()==1){
+					new Profil().createAndShowGUIEtu(getUser());
+				}else{
+					if(getUser().getRole()==2){
+						new Profil().createAndShowGUIEnt(getUser(), getEntr());
+					}else{
+						new Profil().createAndShowGUIAdmin(getUser());
+					}
+					//setVisible(false);
+				}}
+		});		
 		quitter.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -104,14 +145,21 @@ public class ChoixFrame extends JFrame {
 				setVisible(false);
 			}
 		});
-
 	}
 
-	public int getQui() {
-		return qui;
+	public Utilisateur getUser() {
+		return user;
 	}
 
-	public void setQui(int qui) {
-		this.qui = qui;
+	public void setUser(Utilisateur user) {
+		this.user = user;
+	}
+
+	public Entreprise getEntr() {
+		return entr;
+	}
+
+	public void setEntr(Entreprise entr) {
+		this.entr = entr;
 	}
 }

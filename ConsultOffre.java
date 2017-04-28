@@ -2,122 +2,226 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Vector;
+import java.util.logging.SimpleFormatter;
+
+import javax.naming.spi.DirStateFactory.Result;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 import allConnexion.*;
 
-public class ConsultOffre extends JFrame{
+public class ConsultOffre extends Frame{
 
-	private int qui;
-	
-	BorderLayout border = new BorderLayout();
-	JButton retour = new JButton("Retour");
-	JButton envoyer = new JButton("Envoyer");
-	JLabel titre = new JLabel("CONSULTATION DES OFFRES DE STAGE");
-	JPanel center = new JPanel(new FlowLayout());
-	JPanel center2 = new JPanel();
-	JPanel center3 = new JPanel(new FlowLayout());
-	JPanel nameField = new JPanel(new FlowLayout());
-	JPanel bottomButton = new JPanel(new GridLayout(1,2, 50, 0));
+	private Utilisateur user;
+	private Entreprise entr;
+	private DefaultTableModel dtm = null;
+	private String tableTitle[] = {"Nom_Entreprise", "Domaine", "Libelle", "Date", "Duree", "Descriptif"};
+	private List<Offres> listOffres = new ArrayList<Offres>();
+	private int taille = 0, id, duree=0;
+	private TableModel modele;
+	private JTable table;
+	private Offres o, o2;
+	private Date date;
+	private DateFormat formatter;
+	private String date2;
 
-	private JLabel lNom = new JLabel("Nom de l'entreprise:"),
-			lVille = new JLabel("Ville du stage:"),
-			lMail = new JLabel("Mail du contact:"),
-			lDomaine = new JLabel("Domaine:"),
-			lLibOffice = new JLabel("Libellé de l'offre:"),
-			lDate = new JLabel("Date de début du stage:"),
-			lDuree = new JLabel("Durée du stage:"),
-			lDescription = new JLabel("Description de l'offre:");
-	
-	private JTextField tNom = new JTextField(),
-			tVille = new JTextField(),
-			tMail = new JTextField(),
-			tDomaine = new JTextField(),
-			tLibOffice = new JTextField(),
-			tDate = new JTextField(),
-			tDuree = new JTextField(),
-			tDescription = new JTextField();
-	private JScrollPane scroll = new JScrollPane(tDescription);
-	
-	private String nom;//nom de l'entreprise
-	private String ville;//ville du stage
-	private String mail;//mail du contact
-	private String domaine;//ENUMERATION ?
-	private String libOffre;//libellÃ© de l'offre
-	private Date date;//date de dÃ©but du stage
-	private int duree; //durÃ©e du stage
-	private String description; //description de l'offre
-	
+	public ConsultOffre(Utilisateur user){
+		super();
+		setUser(user);
 
-	public ConsultOffre(int a){
-		super("Consulter Offre");
-		this.qui = a;
-		
-		//Conf
-		this.setLayout(border);
-		this.setSize(1000, 400);
-		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);             
-		this.setVisible(true);
-		
-		//ConfObject
-		titre.setFont(new Font("Tahoma", 1, 35));
-		tDescription.setBounds(4, 100, 300, 50);
-		center2.setLayout(new BoxLayout(center2, BoxLayout.PAGE_AXIS));
+		OffresDaoImpl Offres = new OffresDaoImpl();
+		try {
+			//taille = Offres.listOffreAll().size();
+			setListOffres(Offres.listOffreAll());
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		//Add
-		this.add(center, BorderLayout.NORTH);
-		this.add(center2, BorderLayout.WEST);
-		this.add(center3, BorderLayout.SOUTH); 
-		//this.add(retour, BorderLayout.SOUTH);
-		center.add(titre);
-		center2.add(nameField);
-		center3.add(bottomButton);
-		bottomButton.add(envoyer);
-		bottomButton.add(retour);
-		nameField.add(lVille);
-		nameField.add(tVille);
-		nameField.add(lNom);
-		nameField.add(tNom);
-		/*nameField.add(lMail);
-		nameField.add(tMail);
-		nameField.add(lDomaine);
-		nameField.add(tDomaine);
-		nameField.add(lLibOffice);
-		nameField.add(tLibOffice);
-		nameField.add(lDate);
-		nameField.add(tDate);
-		nameField.add(lDuree);
-		nameField.add(tDuree);
-		nameField.add(lDescription);
-		nameField.add(scroll);*/
+		modele = new TableModel(getListOffres());
+		table = new JTable(modele);		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		//Add Item
+		super.envoyer.setText("Visualiser");
+		super.add(center, BorderLayout.NORTH);
+		super.add(new JScrollPane(table), BorderLayout.CENTER);
+		super.add(center3, BorderLayout.SOUTH); 
+		super.center3.add(bottomButton);
+		super.bottomButton.add(envoyer);
+		super.bottomButton.add(retour);
+		//System.out.println("User ConsultOffre: "+getUser().toString());
 
 		//Actions
-		retour.addActionListener(new ActionListener(){
+		super.envoyer.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				new ChoixFrame(getQui());
+				int selection = table.getSelectedRow();
+				setDuree((int) table.getValueAt(selection, 4));
+				formatter = new SimpleDateFormat("YYYY-MM-DD");
+				date = new Date();
+				setDate2(table.getValueAt(selection, 3).toString());
+				try {
+					setDate(getFormatter().parse(getDate2()));
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				o = new Offres((String) table.getValueAt(selection, 0),
+						(String) table.getValueAt(selection, 1),
+						(String) table.getValueAt(selection, 2),
+						getDate(),
+						getDuree(),
+						(String) table.getValueAt(selection, 5));
+				OffresDaoImpl odi = new OffresDaoImpl();
+				UtilisateurDaolmpl udi = new UtilisateurDaolmpl();
+				EntrepriseDaoImpl edi = new EntrepriseDaoImpl();
+				try {
+					setUser(udi.recupUtilisateur(user));
+					setEntr(edi.userEntreprise(getUser()));
+					setId(odi.idOffres(o));
+				} catch (DAOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				new ConsultFrame(getUser(),getUser().getId(), getId(), getEntr().getId());
+			}
+		});
+		super.retour.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				new ChoixFrame(getUser());
 				setVisible(false);
 			}
 		});
 	}
 
-
-	public int getQui() {
-		return qui;
+	public Utilisateur getUser() {
+		return user;
 	}
 
+	public void setUser(Utilisateur user) {
+		this.user = user;
+	}
 
-	public void setQui(int qui) {
-		this.qui = qui;
+	public DefaultTableModel getDtm() {
+		return dtm;
+	}
+
+	public void setDtm(DefaultTableModel dtm) {
+		this.dtm = dtm;
+	}
+
+	public String[] getTableTitle() {
+		return tableTitle;
+	}
+
+	public void setTableTitle(String[] tableTitle) {
+		this.tableTitle = tableTitle;
+	}
+
+	public List<Offres> getListOffres() {
+		return listOffres;
+	}
+
+	public void setListOffres(List<Offres> listOffres) {
+		this.listOffres = listOffres;
+	}
+
+	public int getTaille() {
+		return taille;
+	}
+
+	public void setTaille(int taille) {
+		this.taille = taille;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Offres getO() {
+		return o;
+	}
+
+	public void setO(Offres o) {
+		this.o = o;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public int getDuree() {
+		return duree;
+	}
+
+	public void setDuree(int i) {
+		this.duree = i;
+	}
+	public Offres getO2() {
+		return o2;
+	}
+
+	public void setO2(Offres o2) {
+		this.o2 = o2;
+	}
+	public DateFormat getFormatter() {
+		return formatter;
+	}
+
+	public void setFormatter(DateFormat formatter) {
+		this.formatter = formatter;
+	}
+	public String getDate2() {
+		return date2;
+	}
+
+	public void setDate2(String date2) {
+		this.date2 = date2;
+	}
+	public Entreprise getEntr() {
+		return entr;
+	}
+
+	public void setEntr(Entreprise entr) {
+		this.entr = entr;
 	}
 }

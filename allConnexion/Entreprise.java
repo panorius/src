@@ -4,14 +4,15 @@ import javax.swing.JTextField;
 
 public class Entreprise {
 	
-	private int id=0;
+	private int id,idUtilisateur;
 	private String nom;
 	private String numRue;
 	private int cPostal;
 	private String Ville, mail, tel, secteur;
 	
-	public Entreprise(String nom, String numRue, int cPostal, String Ville, String mail, String tel, String secteur){
-		this.id=0;
+	public Entreprise(int idEntr, String nom, String numRue, int cPostal, String Ville, String mail, String tel, String secteur){
+		this.id=idEntr;
+		this.idUtilisateur=0;
 		this.nom = nom;
 		this.numRue = numRue;
 		this.cPostal = cPostal;
@@ -20,8 +21,17 @@ public class Entreprise {
 		this.tel = tel;
 		this.secteur = secteur;
 	}
-	
-	public Entreprise(){}
+	public Entreprise( String nom, String numRue, int cPostal, String Ville, String mail, String tel, String secteur){
+		this.id=0;
+		this.idUtilisateur=0;
+		this.nom = nom;
+		this.numRue = numRue;
+		this.cPostal = cPostal;
+		this.Ville = Ville;
+		this.mail = mail;
+		this.tel = tel;
+		this.secteur = secteur;
+	}	
 	
 	public Entreprise(JTextField gettNomEnt, JTextField gettAdresse, JTextField gettCp, JTextField gettVille,
 			JTextField gettMail, JTextField gettTel, JTextField gettSecteurEnt) {
@@ -77,10 +87,20 @@ public class Entreprise {
 		this.secteur = secteur;
 	}
 
+	public int getIdUtilisateur() {
+		return idUtilisateur;
+	}
+
+
+	public void setIdUtilisateur(int idUtilisateur) {
+		this.idUtilisateur = idUtilisateur;
+	}
+
+
 	@Override
 	public String toString() {
-		return "Entreprise [nom=" + nom + ", numRue=" + numRue + ", cPostal=" + cPostal + ", Ville=" + Ville + ", mail="
-				+ mail + ", tel=" + tel + ", secteur=" + secteur + "]";
+		return "Entreprise [id=" + id + ", idUtilisateur=" + idUtilisateur + ", nom=" + nom + ", numRue=" + numRue
+				+ ", cPostal=" + cPostal + ", Ville=" + Ville + ", mail=" + mail + ", tel=" + tel + ", secteur="
+				+ secteur + "]";
 	}
-	
 }
