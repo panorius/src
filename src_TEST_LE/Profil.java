@@ -500,10 +500,10 @@ public class Profil {
 		OffresDaoImpl odi2 = new OffresDaoImpl();
 		ListOffresDaoImpl ldi2 = new ListOffresDaoImpl();
 		try {
-			i2 = edi.userEntreprise(user);
-			System.out.println("l'ID user: "+i2.getId());
-			i3 = i2.getId();
-			setListId(ldi2.recupListOffresByID(i3));
+			//i2 = edi.userEntreprise(user);
+			//System.out.println("l'ID user: "+i2.getId());
+			i3 = ent.getId();
+			setListId(ldi2.recupListOffresByID2(i3));
 			for(Iterator<Integer> iter = getListId().iterator(); iter.hasNext();){
 				int a = iter.next();
 				getListStatut().addAll(ldi2.recupStatutForEntr(a, ent.getId()));

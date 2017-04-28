@@ -282,13 +282,13 @@ public class Accueil extends JFrame {
 				try {
 					n.creer(e);
 					if(getUser().getRole()==2){
-						if(n.isEntCreer(getUser())==false){
+						//if(n.isEntCreer(getUser())==false){
 							new CreerEntreprise(getUser());
 							setVisible(false);
-						}else{
-							new ChoixFrame(getUser());
-							setVisible(false);
-						}
+						//}else{
+							//new ChoixFrame(getUser());
+							//setVisible(false);
+						//}
 					}else{
 						new ChoixFrame(getUser());
 						setVisible(false);

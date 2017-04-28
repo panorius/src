@@ -54,6 +54,28 @@ public class ListOffresDaoImpl implements ListOffresDao{
 		}
 		return listIdOffres;
 	}
+	public List<Integer> recupListOffresByID2(int i)throws DAOException, SQLException {
+		List<Integer> listIdOffres = new ArrayList<Integer>();
+		try {
+			final String SQL_SELECT = "SELECT idOffre FROM listoffres WHERE idEntreprise = ?";
+			state = SingletonBDD.getInstance().prepareStatement(SQL_SELECT);
+			state.setInt(1, i);
+			ResultSet rs = state.executeQuery();
+			while(rs.next()){
+				//Offres offre = new Offres(rs.getString(1),rs.getString(2),rs.getString(3),rs.getDate(4),rs.getInt(5),rs.getString(6));
+				listIdOffres.add(rs.getInt(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(state!=null){
+				state.close();
+			}
+		}
+		return listIdOffres;
+	}
 	public void changeStatut(String statut,int idOffre, int idUser) throws SQLException{
 		try {
 			final String SQL_UPDATE = "UPDATE listoffres SET validation = ? WHERE idUtilisateur = ? AND idOffre = ?";
