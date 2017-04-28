@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Client :  127.0.0.1
--- Généré le :  Lun 24 Avril 2017 à 22:14
+-- Généré le :  Ven 28 Avril 2017 à 10:37
 -- Version du serveur :  5.7.14
 -- Version de PHP :  5.6.25
 
@@ -66,16 +66,18 @@ INSERT INTO `entreprise` (`idEntreprise`, `idUtilisateur`, `nom`, `numRue`, `vil
 CREATE TABLE `listoffres` (
   `idUtilisateur` int(11) NOT NULL,
   `idOffre` int(11) NOT NULL,
-  `idEntreprise` int(11) NOT NULL
+  `idEntreprise` int(11) NOT NULL,
+  `validation` varchar(30) DEFAULT 'En_Attente'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Contenu de la table `listoffres`
 --
 
-INSERT INTO `listoffres` (`idUtilisateur`, `idOffre`, `idEntreprise`) VALUES
-(1, 1, 1),
-(1, 2, 1);
+INSERT INTO `listoffres` (`idUtilisateur`, `idOffre`, `idEntreprise`, `validation`) VALUES
+(1, 1, 1, '"En_Attente"'),
+(1, 2, 1, '"En_Attente"'),
+(1, 3, 1, 'En_Attente');
 
 -- --------------------------------------------------------
 
